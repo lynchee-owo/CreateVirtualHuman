@@ -16,9 +16,9 @@ const Home: NextPage = () => {
 
       // Call OpenAI API
       const gptGeneratedText = await callOpenAIAPI(prompt);
-      // // Call Eleven Labs API
-      // const generatedAudio = await callElevenLabsAPI(gptGeneratedText, audioFile);
-
+      // Call Eleven Labs API
+      const generatedAudio = await callElevenLabsAPI(gptGeneratedText, "21m00Tcm4TlvDq8ikWAM");
+      console.log("generatedAudio:", generatedAudio);
       // // Call D-ID API
       // const generatedVideo = await callDIDAPI(generatedAudio, photo);
 

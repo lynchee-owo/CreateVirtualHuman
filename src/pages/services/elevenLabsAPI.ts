@@ -1,23 +1,33 @@
 // src/services/elevenLabsAPI.ts
 
-import axios from 'axios';
+export const callElevenLabsAPI = async (text: string, voice_id: string) => {
+    try {
+        if (!text || text.trim() === "") {
+            alert("Enter some text");
+            return;
+        }
 
-export const callElevenLabsAPI = async (text: string, audioFile: File): Promise<Blob> => {
-  try {
-    const formData = new FormData();
-    formData.append('text', text);
-    formData.append('audioFile', audioFile);
+        const response = await fetch('/api/textToSpeech', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                message: text, 
+                voice: voice_id,
+            }),
+        });
 
-    const response = await axios.post('https://api.eleven-labs.com/generate-audio', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        'Authorization': `Bearer ${process.env.ELEVEN_LABS_API_KEY}`,
-      },
-    });
+        if (!response.ok) {
+            console.error('Error generating speech:', response.status);
+            throw new Error("Something went wrong:(");
+        }
+        const { file } = await response.json();
+        console.log("Autio file name: ", file);
 
-    return response.data.audio;
-  } catch (error) {
-    console.error('Error calling Eleven Labs API:', error);
-    throw error;
-  }
+        return file;
+    } catch (error) {
+        console.log(error.message);
+    }
 };
+  
