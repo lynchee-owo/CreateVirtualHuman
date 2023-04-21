@@ -1,23 +1,31 @@
 // src/services/dIDAPI.ts
 
-import axios from 'axios';
-
-export const callDIDAPI = async (audio: Blob, photo: File): Promise<Blob> => {
+export const callDIDAPI = async (text: string, photo: string) => {
   try {
-    const formData = new FormData();
-    formData.append('audio', audio);
-    formData.append('photo', photo);
+    console.log("Calling DID API...");
 
-    const response = await axios.post('https://api.d-id.com/generate-video', formData, {
+    const response = await fetch('/api/createVideo', {
+      method: 'POST',
       headers: {
-        'Content-Type': 'multipart/form-data',
-        'Authorization': `Bearer ${process.env.D_ID_API_KEY}`,
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({ 
+          audio: text, 
+          photo: photo,
+      }),
     });
 
-    return response.data.video;
-  } catch (error) {
-    console.error('Error calling D-ID API:', error);
-    throw error;
+    if (!response.ok) {
+      console.error('Error generating video:', response.status);
+      throw new Error("Something went wrong:(");
+  }
+
+    const data = await response.json();
+    console.log("createVideo API response: ", data);
+
+    return data;
+  } catch (err) {
+    console.error(err);
+    throw new Error('Error calling createVideo API');
   }
 };

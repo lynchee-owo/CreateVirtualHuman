@@ -43,7 +43,8 @@ export async function textToSpeech(req: NextApiRequest, res: NextApiResponse) {
 
     res.status(200).json({ file: `${file}.mp3` });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in /api/textToSpeech:', error);
+    res.status(500).json({ message: 'Internal Server Error (XI)' });
   }
 }
 

@@ -19,8 +19,9 @@ const Home: NextPage = () => {
       // Call Eleven Labs API
       const generatedAudio = await callElevenLabsAPI(gptGeneratedText, "21m00Tcm4TlvDq8ikWAM");
       console.log("generatedAudio:", generatedAudio);
-      // // Call D-ID API
-      // const generatedVideo = await callDIDAPI(generatedAudio, photo);
+      // Call D-ID API
+      const sample_photo = "https://artofheadshots.com/wp-content/uploads/2022/03/0141Sam-Mehrbod-PRINT-scaled.jpg";
+      const generatedVideo = await callDIDAPI(generatedAudio, sample_photo);
 
       // // Display generated video
       // const videoBlob = new Blob([generatedVideo], { type: 'video/mp4' });

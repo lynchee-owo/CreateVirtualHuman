@@ -22,7 +22,7 @@ const generateAction = async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(200).json({ output: basePromptOutput });
   } catch (error) {
     console.error('Error in /api/gptgenerate:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).json({ message: 'Internal Server Error (GPT)' });
   }
 };
 
