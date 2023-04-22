@@ -26,22 +26,52 @@ async function uploadAudio(audioPath: string): Promise<string> {
   };
 
   const response = await fetch('https://api.d-id.com/audios', options);
-  const data = await response.json();
-
-  if (response.ok) {
-    return data.url;
-  } else {
-    throw new Error(`Failed to upload audio: ${data.description || 'Unknown error'}`);
+  if (!response.ok) {
+    throw new Error('Failed to upload audio');
   }
+
+  const data = await response.json();
+  return data.url;
 }
 
-const createVideo = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { audio, photo } = req.body;
-  const audioPath = path.join(process.cwd(), 'public', 'audio', `${audio}`);
-  console.log("audioPath: ", audioPath);
+
+async function uploadImage(imagePath: string): Promise<string> {
+  const formData = new FormData();
+  formData.append('image', fs.createReadStream(imagePath));
+
+  const options = {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'Authorization': getDIDAuthorizationHeader(),
+      ...formData.getHeaders(),
+    },
+    body: formData,
+  };
 
   try {
+    const response = await fetch('https://api.d-id.com/images', options);
+    if (!response.ok) {
+      throw new Error(`Failed to upload image: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data.url;
+  } catch (error) {
+    console.error('Error in /api/uploadImage:', error);
+    throw error;
+  }
+};
+
+const createVideo = async (req: NextApiRequest, res: NextApiResponse) => {
+  console.log("executing createVideo...");
+  try {
+    const { audio, image } = req.body;
+    const audioPath = path.join(process.cwd(), 'public', 'audio', `${audio}`);
+    console.log("audioPath: ", audioPath);
     const audioUrl = await uploadAudio(audioPath);
+    console.log("audioUrl: ", audioUrl);
+    const imageUrl = await uploadImage(image);
+    console.log("imageUrl: ", imageUrl);
 
     const options = {
       method: 'POST',
@@ -51,7 +81,7 @@ const createVideo = async (req: NextApiRequest, res: NextApiResponse) => {
         'Authorization': getDIDAuthorizationHeader(),
       },
       body: JSON.stringify({
-        source_url: photo,
+        source_url: imageUrl,
         script: {
           type: 'audio',
           audio_url: audioUrl,

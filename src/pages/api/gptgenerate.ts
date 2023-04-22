@@ -7,16 +7,16 @@ const configuration = new Configuration({
 
 const openai = new OpenAIApi(configuration);
 
-const basePromptPrefix = "Write a single headline of 10 words with the topic: ";
+const basePromptPrefix = "Write a short paragraph of 50 words with the topic: ";
 
 const generateAction = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     console.log(`GPT API: ${basePromptPrefix}${req.body.userInput}`);
     const baseCompletion = await openai.createCompletion({
       model: 'text-davinci-003',
-      prompt: `${basePromptPrefix}${req.body.userInput}`,
+      prompt: `${basePromptPrefix}${req.body.userInput}.`,
       temperature: 0.7,
-      max_tokens: 20,
+      max_tokens: 50,
     });
     const basePromptOutput = baseCompletion.data.choices.pop();
     res.status(200).json({ output: basePromptOutput });

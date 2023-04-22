@@ -1,35 +1,64 @@
 // src/pages/index.tsx
-
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import UserForm from './components/UserForm';
 import { callOpenAIAPI } from './services/openaiAPI';
 import { callElevenLabsAPI } from './services/elevenLabsAPI';
-import { callDIDAPI } from './services/dIDAPI';
+import { callDIDAPI, getVideoObject } from './services/didAPI';
+import { useState } from 'react';
 
 const Home: NextPage = () => {
+  const [videoURL, setVideoURL] = useState<string | null>(null);
+
+  const saveFileLocally = async (file: File): Promise<string> => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+          if (event.target?.result) {
+            const base64Data = event.target.result;
+            const response = await fetch('/api/saveTempFile', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ fileName: file.name, data: base64Data }),
+            });
+            const path = await response.text();
+            resolve(path);
+          } else {
+            reject('Error reading file');
+          }
+        };
+        reader.readAsDataURL(file);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  };
+  
+
   const handleSubmit = async (formData: FormData) => {
     try {
       const prompt = formData.get('questions') as string;
       const audioFile = formData.get('audioFile') as File;
-      const photo = formData.get('photo') as File;
-
+      console.log("audioFile: ", audioFile);
+      // TODO: store the audioFile to a temporary local directory
+      const photoFile = formData.get('photo') as File;
+      console.log("photoFile: ", photoFile);
+      // TODO: store the photo to a temporary local directory
+      const photoPath = await saveFileLocally(photoFile);
+      
       // Call OpenAI API
       const gptGeneratedText = await callOpenAIAPI(prompt);
       // Call Eleven Labs API
       const generatedAudio = await callElevenLabsAPI(gptGeneratedText, "21m00Tcm4TlvDq8ikWAM");
-      console.log("generatedAudio:", generatedAudio);
-      // Call D-ID API
-      const sample_photo = "https://artofheadshots.com/wp-content/uploads/2022/03/0141Sam-Mehrbod-PRINT-scaled.jpg";
-      const generatedVideo = await callDIDAPI(generatedAudio, sample_photo);
 
-      // // Display generated video
-      // const videoBlob = new Blob([generatedVideo], { type: 'video/mp4' });
-      // const videoURL = URL.createObjectURL(videoBlob);
-      // const videoElement = document.createElement('video');
-      // videoElement.src = videoURL;
-      // videoElement.controls = true;
-      // document.body.appendChild(videoElement);
+      // Call D-ID API
+      const generatedVideo = await callDIDAPI(generatedAudio, photoPath);
+      const videoSrc = await getVideoObject(generatedVideo['id']);
+      console.log("videoURL: ", videoURL);
+
+      // Display generated video
+      setVideoURL(videoSrc);
     } catch (error) {
       console.error('Error processing the form data:', error);
     }
@@ -46,6 +75,11 @@ const Home: NextPage = () => {
       <main className="flex flex-col items-center gap-4">
         <h1 className="text-4xl font-semibold">Create a virtual human using AI</h1>
         <UserForm onSubmit={handleSubmit} />
+        {videoURL && (
+          <video src={videoURL} controls className="mt-8">
+            Your browser does not support the video tag.
+          </video>
+        )}
       </main>
     </div>
   );

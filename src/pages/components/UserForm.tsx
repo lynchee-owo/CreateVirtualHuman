@@ -14,14 +14,15 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit }) => {
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
 
+    if (!questions || !audioFile || !photo) {
+      alert('Please fill in all the fields and upload both files.');
+      return;
+    }
+
     const formData = new FormData();
     formData.append('questions', questions);
-    if (audioFile) {
-      formData.append('audioFile', audioFile);
-    }
-    if (photo) {
-      formData.append('photo', photo);
-    }
+    formData.append('audioFile', audioFile);
+    formData.append('photo', photo);
 
     onSubmit(formData);
   };
@@ -41,6 +42,7 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit }) => {
         value={questions}
         onChange={(event) => setQuestions(event.target.value)}
         className="border border-black bg-white p-2 rounded"
+        required
       />
 
       <label htmlFor="audioFile" className="font-semibold text-white">Upload audio file:</label>
@@ -50,6 +52,7 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit }) => {
         accept="audio/*"
         onChange={(event) => handleFileChange(event, setAudioFile)}
         className="border border-black bg-white p-2 rounded"
+        required
       />
 
       <label htmlFor="photo" className="font-semibold text-white">Upload photo:</label>
@@ -59,6 +62,7 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit }) => {
         accept="image/*"
         onChange={(event) => handleFileChange(event, setPhoto)}
         className="border border-black bg-white p-2 rounded"
+        required
       />
 
       <button type="submit" className="border border-black bg-white p-2 font-semibold rounded">
