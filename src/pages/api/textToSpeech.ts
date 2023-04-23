@@ -2,9 +2,16 @@ import fs from 'fs';
 import path from "path";
 import { NextApiRequest, NextApiResponse } from 'next';
 import FormData from 'form-data';
+import fetch from 'node-fetch';
 
 export const addVoiceToElevenLabs = async (name: string, audioPath: string): Promise<string> => {
   console.log("executing addVoiceToElevenLabs...");
+
+  const xiApiKey = process.env.XI_API_KEY;
+  if (!xiApiKey) {
+    throw new Error('XI_API_KEY is missing in the environment variables.');
+  }
+
   try {
     const formData = new FormData();
     formData.append('name', name);
@@ -14,7 +21,7 @@ export const addVoiceToElevenLabs = async (name: string, audioPath: string): Pro
       method: 'POST',
       headers: {
         "Accept": "application/json",
-        "xi-api-key": process.env.XI_API_KEY,
+        "xi-api-key": xiApiKey,
       },
       body: formData,
     });
@@ -24,15 +31,20 @@ export const addVoiceToElevenLabs = async (name: string, audioPath: string): Pro
       throw new Error('Something went wrong while adding voice.');
     }
 
-    const { voice_id } = await response.json();
+    const { voice_id } = await response.json() as { voice_id: string };
     return voice_id;
   } catch (error) {
-    console.error('Error adding voice:', error.message);
+    console.error('Error adding voice:', error);
+    throw error;
   }
 };
 
 export async function textToSpeech(req: NextApiRequest, res: NextApiResponse) {
   const { message, audioPath, name } = req.body;
+  const xiApiKey = process.env.XI_API_KEY;
+  if (!xiApiKey) {
+    throw new Error('XI_API_KEY is missing in the environment variables.');
+  }
 
   try {
     const voice_id = await addVoiceToElevenLabs(name, audioPath);
@@ -44,7 +56,7 @@ export async function textToSpeech(req: NextApiRequest, res: NextApiResponse) {
         headers: {
           accept: "audio/mpeg",
           "Content-Type": "application/json",
-          "xi-api-key": process.env.XI_API_KEY,
+          "xi-api-key": xiApiKey,
         },
         body: JSON.stringify({
           text: message,

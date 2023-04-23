@@ -14,6 +14,7 @@ const handler = nextConnect()
     next();
   })
   .post(async (req: NextApiRequest, res: NextApiResponse) => {
+    console.log('saveTempFile called with body:', req.body);
     try {
       const { fileName, data } = req.body;
       if (!fileName || !data) {

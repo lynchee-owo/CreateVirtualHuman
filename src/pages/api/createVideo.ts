@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import path from 'path';
 import fs from 'fs';
 import FormData from 'form-data';
+import fetch from 'node-fetch';
 
 function getDIDAuthorizationHeader(): string {
   const apiKey = process.env.DID_API_KEY;
@@ -31,7 +32,7 @@ async function uploadAudio(audioPath: string): Promise<string> {
     throw new Error('Failed to upload audio');
   }
 
-  const data = await response.json();
+  const data = await response.json() as { url: string };
   return data.url;
 }
 
@@ -56,7 +57,7 @@ async function uploadImage(imagePath: string): Promise<string> {
     if (!response.ok) {
       throw new Error(`Failed to upload image: ${response.statusText}`);
     }
-    const data = await response.json();
+    const data = await response.json() as { url: string };
     return data.url;
   } catch (error) {
     console.error('Error in /api/uploadImage:', error);
@@ -99,7 +100,7 @@ const createVideo = async (req: NextApiRequest, res: NextApiResponse) => {
     if (response.ok) {
       res.status(200).json(data);
     } else {
-      res.status(500).json({ message: `Failed to create video: ${data.description || 'Unknown error'}` });
+      res.status(500).json({ message: 'Failed to create video' });
     }
   } catch (error) {
     console.error('Error in /api/createVideo:', error);

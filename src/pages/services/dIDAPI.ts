@@ -31,7 +31,7 @@ export const callDIDAPI = async (audio: string, image: string) => {
 
 export async function getVideoObject(id: string): Promise<string> {
   let retries = 0;
-  const maxRetries = 10;
+  const maxRetries = 5;
   const delay = 10000; // 10 seconds
 
   while (retries < maxRetries) {
@@ -67,4 +67,5 @@ export async function getVideoObject(id: string): Promise<string> {
       throw error;
     }
   }
+  throw new Error('Max retries reached while waiting for video processing.');
 }

@@ -13,6 +13,7 @@ const Home: NextPage = () => {
   // read the content of the file, send it to the server, save the file temporarily, and return the path to the client.
   // these files are temporary and will be removed when the server restarts or after some time
   const saveFileLocally = async (file: File): Promise<string> => {
+    console.log('saveFileLocally called with file:', file);
     return new Promise(async (resolve, reject) => {
       try {
         const reader = new FileReader();
@@ -24,7 +25,6 @@ const Home: NextPage = () => {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ fileName: file.name, data: base64Data }),
             });
-            // const path = await response.text();
             const { path } = await response.json();
             resolve(path);
           } else {
@@ -57,7 +57,7 @@ const Home: NextPage = () => {
       // Call OpenAI API
       const gptGeneratedText = await callOpenAIAPI(prompt);
       // Call Eleven Labs API
-      const generatedAudio = await callElevenLabsAPI(gptGeneratedText, audioPath, audioFile.name);
+      const generatedAudio = await callElevenLabsAPI(gptGeneratedText, audioFile.name, audioPath);
 
       // Call D-ID API
       const generatedVideo = await callDIDAPI(generatedAudio, photoPath);

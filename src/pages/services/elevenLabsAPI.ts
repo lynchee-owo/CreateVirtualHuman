@@ -28,7 +28,7 @@ export const callElevenLabsAPI = async (text: string, audioName: string, audioPa
 
         return file;
     } catch (error) {
-        console.log(error.message);
+        console.log(error);
     }
 };
   
