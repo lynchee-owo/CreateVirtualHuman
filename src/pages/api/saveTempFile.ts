@@ -1,21 +1,49 @@
+// pages/api/saveTempFile.ts
 import { NextApiRequest, NextApiResponse } from 'next';
-import { promises as fs } from 'fs';
-import { tmpdir } from 'os';
-import { join } from 'path';
+import nextConnect from 'next-connect';
+import fs from 'fs';
+import path from 'path';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'POST') {
+const handler = nextConnect()
+  // Increase the body size limit to 10mb (or any other value you need)
+  .use((req: NextApiRequest, res: NextApiResponse, next) => {
+    const sizeLimit = 10 * 1024 * 1024; // 10 MB
+    if (req.headers['content-length'] && parseInt(req.headers['content-length']) > sizeLimit) {
+      return res.status(413).send('Body size limit exceeded');
+    }
+    next();
+  })
+  .post(async (req: NextApiRequest, res: NextApiResponse) => {
     try {
       const { fileName, data } = req.body;
+      if (!fileName || !data) {
+        res.status(400).json({ error: 'File name or data is missing' });
+        return;
+      }
+
       const base64Data = data.replace(/^data:.+;base64,/, '');
-      const tempPath = join(tmpdir(), fileName);
-      await fs.writeFile(tempPath, base64Data, 'base64');
-      res.status(200).send(tempPath);
+      const buffer = Buffer.from(base64Data, 'base64');
+
+      const tempDir = path.join(process.cwd(), 'temp');
+      if (!fs.existsSync(tempDir)) {
+        fs.mkdirSync(tempDir);
+      }
+
+      const filePath = path.join(tempDir, fileName);
+      fs.writeFileSync(filePath, buffer);
+
+      res.status(200).json({ path: filePath });
     } catch (error) {
-      console.error('Error saving temporary file:', error);
-      res.status(500).send('Error saving temporary file');
+      res.status(500).json({ error: 'Internal server error' });
     }
-  } else {
-    res.status(405).send('Method not allowed');
-  }
-}
+  });
+
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb', // Set the same value as in the custom middleware
+    },
+  },
+};
+
+export default handler;

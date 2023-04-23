@@ -10,6 +10,8 @@ import { useState } from 'react';
 const Home: NextPage = () => {
   const [videoURL, setVideoURL] = useState<string | null>(null);
 
+  // read the content of the file, send it to the server, save the file temporarily, and return the path to the client.
+  // these files are temporary and will be removed when the server restarts or after some time
   const saveFileLocally = async (file: File): Promise<string> => {
     return new Promise(async (resolve, reject) => {
       try {
@@ -22,7 +24,8 @@ const Home: NextPage = () => {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ fileName: file.name, data: base64Data }),
             });
-            const path = await response.text();
+            // const path = await response.text();
+            const { path } = await response.json();
             resolve(path);
           } else {
             reject('Error reading file');
@@ -39,18 +42,22 @@ const Home: NextPage = () => {
   const handleSubmit = async (formData: FormData) => {
     try {
       const prompt = formData.get('questions') as string;
+      // Save the audioFile to a temporary local directory
       const audioFile = formData.get('audioFile') as File;
       console.log("audioFile: ", audioFile);
-      // TODO: store the audioFile to a temporary local directory
+      const audioPath = await saveFileLocally(audioFile);
+      console.log("audioPath: ", audioPath);
+
+      // Save the photo to a temporary local directory
       const photoFile = formData.get('photo') as File;
       console.log("photoFile: ", photoFile);
-      // TODO: store the photo to a temporary local directory
       const photoPath = await saveFileLocally(photoFile);
+      console.log("photoPath: ", photoPath);
       
       // Call OpenAI API
       const gptGeneratedText = await callOpenAIAPI(prompt);
       // Call Eleven Labs API
-      const generatedAudio = await callElevenLabsAPI(gptGeneratedText, "21m00Tcm4TlvDq8ikWAM");
+      const generatedAudio = await callElevenLabsAPI(gptGeneratedText, audioPath, audioFile.name);
 
       // Call D-ID API
       const generatedVideo = await callDIDAPI(generatedAudio, photoPath);

@@ -1,9 +1,9 @@
 // src/services/elevenLabsAPI.ts
-
-export const callElevenLabsAPI = async (text: string, voice_id: string) => {
+export const callElevenLabsAPI = async (text: string, audioName: string, audioPath: string) => {
+    console.log("Executing callElevenLabsAPI...");
     try {
         if (!text || text.trim() === "") {
-            alert("Enter some text");
+            alert("The script is empty");
             return;
         }
 
@@ -14,7 +14,8 @@ export const callElevenLabsAPI = async (text: string, voice_id: string) => {
             },
             body: JSON.stringify({ 
                 message: text, 
-                voice: voice_id,
+                audioPath: audioPath,
+                name: audioName,
             }),
         });
 

@@ -12,6 +12,7 @@ function getDIDAuthorizationHeader(): string {
 }
 
 async function uploadAudio(audioPath: string): Promise<string> {
+  console.log("Upload audio");
   const formData = new FormData();
   formData.append('audio', fs.createReadStream(audioPath));
 
@@ -36,6 +37,7 @@ async function uploadAudio(audioPath: string): Promise<string> {
 
 
 async function uploadImage(imagePath: string): Promise<string> {
+  console.log("Upload image");
   const formData = new FormData();
   formData.append('image', fs.createReadStream(imagePath));
 
@@ -68,6 +70,7 @@ const createVideo = async (req: NextApiRequest, res: NextApiResponse) => {
     const { audio, image } = req.body;
     const audioPath = path.join(process.cwd(), 'public', 'audio', `${audio}`);
     console.log("audioPath: ", audioPath);
+    console.log("imagePath: ", image);
     const audioUrl = await uploadAudio(audioPath);
     console.log("audioUrl: ", audioUrl);
     const imageUrl = await uploadImage(image);
