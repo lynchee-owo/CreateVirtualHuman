@@ -4,6 +4,7 @@ import { ChangeEvent, FormEvent, useState } from 'react';
 
 type UserFormProps = {
   onSubmit: (formData: FormData) => void;
+  isLoading: boolean;
 };
 
 const UserForm: React.FC<UserFormProps> = ({ onSubmit, isLoading }) => {
