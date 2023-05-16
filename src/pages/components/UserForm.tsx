@@ -71,7 +71,7 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit, isLoading }) => {
         </button>
       ) : (
         <button type="submit" className="border border-black bg-white p-2 font-semibold rounded">
-          Let's Talk
+          Start Talking!
         </button>
       )}
       
