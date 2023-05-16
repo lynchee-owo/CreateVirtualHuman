@@ -6,7 +6,7 @@ type UserFormProps = {
   onSubmit: (formData: FormData) => void;
 };
 
-const UserForm: React.FC<UserFormProps> = ({ onSubmit }) => {
+const UserForm: React.FC<UserFormProps> = ({ onSubmit, isLoading }) => {
   const [questions, setQuestions] = useState('');
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [photo, setPhoto] = useState<File | null>(null);
@@ -36,7 +36,7 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit }) => {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-black">
-      <label htmlFor="questions" className="font-semibold text-white">Topic:</label>
+      <label htmlFor="questions" className="font-semibold">Topic:</label>
       <textarea
         id="questions"
         value={questions}
@@ -45,7 +45,7 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit }) => {
         required
       />
 
-      <label htmlFor="audioFile" className="font-semibold text-white">Upload audio file:</label>
+      <label htmlFor="audioFile" className="font-semibold">Upload audio file:</label>
       <input
         type="file"
         id="audioFile"
@@ -55,7 +55,7 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit }) => {
         required
       />
 
-      <label htmlFor="photo" className="font-semibold text-white">Upload photo:</label>
+      <label htmlFor="photo" className="font-semibold">Upload photo:</label>
       <input
         type="file"
         id="photo"
@@ -65,9 +65,16 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit }) => {
         required
       />
 
-      <button type="submit" className="border border-black bg-white p-2 font-semibold rounded">
-        Create Virtual Human
-      </button>
+      { isLoading ? (
+        <button type="submit" className="border border-black bg-white p-2 font-semibold rounded" disabled>
+          Generating...
+        </button>
+      ) : (
+        <button type="submit" className="border border-black bg-white p-2 font-semibold rounded">
+          Let's Talk
+        </button>
+      )}
+      
     </form>
   );
 };

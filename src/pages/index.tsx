@@ -2,13 +2,14 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import UserForm from './components/UserForm';
-import { callOpenAIAPI } from './services/openaiAPI';
-import { callElevenLabsAPI } from './services/elevenLabsAPI';
-import { callDIDAPI, getVideoObject } from './services/didAPI';
+import { callOpenAIAPI } from '../services/openaiAPI';
+import { callElevenLabsAPI } from '../services/elevenLabsAPI';
+import { callDIDAPI, getVideoObject } from '../services/didAPI';
 import { useState } from 'react';
 
 const Home: NextPage = () => {
   const [videoURL, setVideoURL] = useState<string | null>(null);
+  const [ isLoading, setIsLoading ] = useState<boolean>(false);
 
   // read the content of the file, send it to the server, save the file temporarily, and return the path to the client.
   // these files are temporary and will be removed when the server restarts or after some time
@@ -40,6 +41,7 @@ const Home: NextPage = () => {
   
 
   const handleSubmit = async (formData: FormData) => {
+    setIsLoading(true);
     try {
       const prompt = formData.get('questions') as string;
       // Save the audioFile to a temporary local directory
@@ -66,22 +68,24 @@ const Home: NextPage = () => {
 
       // Display generated video
       setVideoURL(videoSrc);
+      setIsLoading(false);
     } catch (error) {
       console.error('Error processing the form data:', error);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center">
+    <div className="min-h-screen flex flex-col items-center justify-center">
       <Head>
-        <title>Create Virtual Human</title>
-        <meta name="description" content="Create a virtual human using AI" />
+        <title>EduTalk</title>
+        <meta name="description" content="Create an AI Talking Head" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className="flex flex-col items-center gap-4">
-        <h1 className="text-4xl font-semibold">Create a virtual human using AI</h1>
-        <UserForm onSubmit={handleSubmit} />
+        <h1 className="text-4xl font-semibold">Talk to George Washington</h1>
+        <UserForm isLoading={isLoading} onSubmit={handleSubmit} />
         {videoURL && (
           <video src={videoURL} controls className="mt-8">
             Your browser does not support the video tag.
