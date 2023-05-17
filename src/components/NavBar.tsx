@@ -5,8 +5,6 @@ import {
   Toolbar,
   IconButton,
 } from "@mui/material";
-import logo from "../images/logo.png";
-import "../App.css";
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 
@@ -38,11 +36,11 @@ function NavBar() {
   };
 
   return (
-    <AppBar position="static" elevation={0}>
+    <AppBar position="static" elevation={0} style={{backgroundColor: '#FFFFFF'}}>
       <Toolbar
-        sx={{ minHeight: "90px", display: "flex", alignItems: "flex-end" }}
+        sx={{ minHeight: "90px", display: "flex", alignItems: "flex-end", justifyContent: "flex-end" }}
       >
-        <IconButton 
+        {/* <IconButton 
           edge="start" 
           color="inherit" 
           aria-label="logo" 
@@ -54,27 +52,27 @@ function NavBar() {
             alt="Logo"
             style={{ height: "40px", width: "auto" }}
           />
-        </IconButton>
+        </IconButton> */}
         <Button
-          color="inherit"
+          style={{color: '#800080'}}
           onClick={handleConversation}
         >
           Conversation
         </Button>
         <Button
-          color="inherit"
+          style={{color: '#800080'}}
           onClick={handleSpeech}
         >
           Speech
         </Button>
         <Button
-          color="inherit"
+          style={{color: '#800080'}}
           onClick={()=>{handleAboutUS()}}
         >
           About Us
         </Button>
         <Button
-          color="inherit"
+          style={{color: '#800080'}}
           onClick={()=>{handleContact()}}
         >
           Contact

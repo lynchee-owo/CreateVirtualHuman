@@ -1,23 +1,29 @@
-// src/components/TalkingHead.tsx
+import { FC } from 'react';
+import Image from 'next/image';
 
-// background: purple-ish
+interface TalkingHeadProps {
+    videoURL: string | null;
+    imageURL: string | null;
+}
 
-// top left: character name
-
-// middle
-    // at the beginning: jpeg
-    // after user creates: video (mp4)
-
-// right: description of the figure(?)
-const TalkingHead = ( videoURL? ) => {
+const TalkingHead: FC<TalkingHeadProps> = ({ videoURL, imageURL }) => {
     return (
-        {videoURL ? (
-            <video src={videoURL} controls className="mt-8">
-                Your browser does not support the video tag.
-            </video>
-        ) : (
-            <Image src={imageURL} />
-        )}
+        <div style={{display: 'flex', justifyContent: 'center', width: '100%'}}>
+            {videoURL ? (
+                <video src={videoURL} controls>
+                    Your browser does not support the video tag.
+                </video>
+            ) : (
+                imageURL ? (
+                    <Image src={imageURL} alt="placeholder" width={645} height={405} />
+                ) : (
+                    <div style={{display: 'flex', justifyContent: 'center'}}>
+                        <Image src={"https://assets.editorial.aetnd.com/uploads/2009/10/washington-gettyimages-640483581.jpg"} alt="placeholder" width={1920} height={1080} style={{objectFit: 'cover', width: '90%', height: '90%'}} />
+                        {/* <Image src="/default_head.png" alt="placeholder" width={645} height={405} /> */}
+                    </div>
+                )
+            )}
+        </div>
     )
 }
 

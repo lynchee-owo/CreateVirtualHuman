@@ -1,6 +1,7 @@
-// src/components/UserForm.tsx
-
 import { ChangeEvent, FormEvent, useState } from 'react';
+import { IconButton } from '@mui/material';
+import MicIcon from '@mui/icons-material/Mic';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 
 type UserFormProps = {
   onSubmit: (formData: FormData) => void;
@@ -36,46 +37,57 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit, isLoading }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-black">
-      <label htmlFor="questions" className="font-semibold">Topic:</label>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-black p-8 rounded-lg w-1/2">
+      <label htmlFor="questions" className="font-semibold text-white">What is the topic?</label>
       <textarea
         id="questions"
         value={questions}
         onChange={(event) => setQuestions(event.target.value)}
-        className="border border-black bg-white p-2 rounded"
+        className="border border-white bg-white p-2 rounded w-full"
         required
       />
 
-      <label htmlFor="audioFile" className="font-semibold">Upload audio file:</label>
-      <input
-        type="file"
-        id="audioFile"
-        accept="audio/*"
-        onChange={(event) => handleFileChange(event, setAudioFile)}
-        className="border border-black bg-white p-2 rounded"
-        required
-      />
+      <div className="flex justify-between">
+        <div>
+          <label className="font-semibold text-white">Upload audio file:</label>
+          <IconButton color="primary" component="label" className="bg-blue-200 rounded-full w-20 h-20 flex items-center justify-center">
+            <input
+              type="file"
+              id="audioFile"
+              accept="audio/*"
+              onChange={(event) => handleFileChange(event, setAudioFile)}
+              className="hidden"
+              required
+            />
+            <MicIcon />
+          </IconButton>
+        </div>
 
-      <label htmlFor="photo" className="font-semibold">Upload photo:</label>
-      <input
-        type="file"
-        id="photo"
-        accept="image/*"
-        onChange={(event) => handleFileChange(event, setPhoto)}
-        className="border border-black bg-white p-2 rounded"
-        required
-      />
+        <div>
+          <label className="font-semibold text-white">Upload photo:</label>
+          <IconButton color="primary" component="label" className="bg-blue-200 rounded-full w-20 h-20 flex items-center justify-center">
+            <input
+              type="file"
+              id="photo"
+              accept="image/*"
+              onChange={(event) => handleFileChange(event, setPhoto)}
+              className="hidden"
+              required
+            />
+            <PhotoCameraIcon />
+          </IconButton>
+        </div>
+      </div>
 
       { isLoading ? (
-        <button type="submit" className="border border-black bg-white p-2 font-semibold rounded" disabled>
+        <button type="submit" className="border border-white bg-white p-2 font-semibold rounded w-full" disabled>
           Generating...
         </button>
       ) : (
-        <button type="submit" className="border border-black bg-white p-2 font-semibold rounded">
-          Start Talking!
+        <button type="submit" className="border border-white bg-white p-2 font-semibold rounded w-full">
+          Create Speech!
         </button>
       )}
-      
     </form>
   );
 };

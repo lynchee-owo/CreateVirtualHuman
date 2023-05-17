@@ -1,37 +1,36 @@
-// src/components/Conversation.tsx
-// the conversation component supports synchronous talking. It can interact with users.
-// currently only show people talking with the figure and hear the voice, no animation
-
-// src/components/Speech.tsx
-// the speech component does not support synchronous talking. It cannot interact with users.
-import { callOpenAIAPI } from '../services/openaiAPI';
-import { callElevenLabsAPI } from '../services/elevenLabsAPI';
-import { callDIDAPI, getVideoObject } from '../services/didAPI';
-import { useState } from 'react';
-import NavBar from './NavBar';
+import React, { useState, useRef } from 'react';
 import TalkingHead from './TalkingHead';
+import { callOpenAIAPI } from '../services/openaiAPI';
+import { Button, Typography } from '@mui/material';
 
 const Speech = () => {
-  const [ videoURL, setVideoURL ] = useState<string | null>(null);
-  const [ isLoading, setIsLoading ] = useState<boolean>(false);
+  const [messages, setMessages] = useState([]);
+  const textareaRef = useRef();
 
-  const voiceToText = () => {
-    console.log("turn user voice into text");
-  }
+  const handleClick = async () => {
+    const userInput = textareaRef.current.value;
+    setMessages(prevMessages => [...prevMessages, { text: userInput, type: 'user' }]);
+    await generateResponse(userInput);
+  };
 
-  const textToVoice = () => {
-    console.log("turn text into AI talking")
+  const generateResponse = async (message) => {
+     const prompt = "reply to this message: " + message;
+     const gptGeneratedText = await callOpenAIAPI(prompt);
+     setMessages(prevMessages => [...prevMessages, { text: gptGeneratedText, type: 'bot' }]);
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center">
-        <NavBar />
-        <TalkingHead />
-        {/* button "Let's Talk". On click, shows the text "we are listening..." with a microphone icon*/}
-        {/* animation of sound to show we are receiving user voice input */}
-        {/* once user stops talking, voiceToText, show what user said in text as a message bubble (like Siri) */}
-        {/* AI receives the text -> generate a response based on this text -> textToVoice, and AI's script is also shown as a message bubble. */}
-        {/* A button at the bottom of the screen "End Conversation" */}
+    <div id="conversation" className="h-screen flex flex-col items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600">
+      <TalkingHead />
+      <textarea ref={textareaRef} className="w-full"></textarea>
+      <button onClick={handleClick}>Send</button>
+      {messages.map((message, index) => (
+        <div key={index} className="text-base">
+          <div className="items-start">
+            <Typography>{message.text}</Typography>
+          </div>
+        </div>
+      ))}
     </div>
   );
 };

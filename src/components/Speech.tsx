@@ -3,13 +3,17 @@
 import { callOpenAIAPI } from '../services/openaiAPI';
 import { callElevenLabsAPI } from '../services/elevenLabsAPI';
 import { callDIDAPI, getVideoObject } from '../services/didAPI';
-import { useState } from 'react';
-import NavBar from './NavBar';
 import TalkingHead from './TalkingHead';
+import { FormEvent, useState } from 'react';
+import UserForm from './UserForm';
+import { Typography } from '@mui/material';
 
 const Speech = () => {
-  const [ videoURL, setVideoURL ] = useState<string | null>(null);
-  const [ isLoading, setIsLoading ] = useState<boolean>(false);
+  const [videoURL, setVideoURL] = useState<string | null>(null);
+  const [imageURL, setImageURL] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [question, setQuestion] = useState<string>('');
+
 
   // read the content of the file, send it to the server, save the file temporarily, and return the path to the client.
   // these files are temporary and will be removed when the server restarts or after some time
@@ -42,6 +46,7 @@ const Speech = () => {
 
   const generateTalkingHead = async (formData: FormData) => {
     setIsLoading(true);
+
     try {
       const prompt = formData.get('questions') as string;
       // Save the audioFile to a temporary local directory
@@ -55,6 +60,7 @@ const Speech = () => {
       console.log("photoFile: ", photoFile);
       const photoPath = await saveFileLocally(photoFile);
       console.log("photoPath: ", photoPath);
+      setImageURL(photoPath);
       
       // Call OpenAI API
       const gptGeneratedText = await callOpenAIAPI(prompt);
@@ -64,7 +70,7 @@ const Speech = () => {
       // Call D-ID API
       const generatedVideo = await callDIDAPI(generatedAudio, photoPath);
       const videoSrc = await getVideoObject(generatedVideo['id']);
-      console.log("videoURL: ", videoURL);
+      console.log("videoSrc: ", videoSrc);
 
       // Display generated video
       setVideoURL(videoSrc);
@@ -76,15 +82,17 @@ const Speech = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center">
-        <NavBar />
-        {videoURL && <TalkingHead videoURL={videoURL}/>}
-        {/* input box label "What do you want to say to {figure_name}" */}
-        {/* input box: user types their question */}
-        {/* button "Submit". onclick, generateTalkingHead */}
-        {/* button at the bottom of screen "Stop" */}
+    <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600">
+      <Typography variant="h2" style={{ color: 'white', marginBottom: '1rem', fontWeight: 'bold' }}>
+        Create Your Custom Speech!
+      </Typography>
+      { videoURL ? (
+        <TalkingHead videoURL={videoURL} />
+      ) : (
+        <UserForm onSubmit={generateTalkingHead} isLoading={isLoading} />
+      )}
     </div>
   );
 };
-
+  
 export default Speech;
