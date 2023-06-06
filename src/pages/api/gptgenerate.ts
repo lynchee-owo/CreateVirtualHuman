@@ -7,7 +7,7 @@ const configuration = new Configuration({
 
 const openai = new OpenAIApi(configuration);
 
-const basePromptPrefix = "Write a short paragraph of 50 words with the topic: ";
+const basePromptPrefix = "Answer the following query: ";
 
 const generateAction = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
@@ -16,7 +16,7 @@ const generateAction = async (req: NextApiRequest, res: NextApiResponse) => {
       model: 'text-davinci-003',
       prompt: `${basePromptPrefix}${req.body.userInput}.`,
       temperature: 0.7,
-      max_tokens: 50,
+      max_tokens: 100,
     });
     const basePromptOutput = baseCompletion.data.choices.pop();
     res.status(200).json({ output: basePromptOutput });
@@ -27,4 +27,3 @@ const generateAction = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 export default generateAction;
-
