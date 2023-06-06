@@ -90,6 +90,9 @@ const createVideo = async (req: NextApiRequest, res: NextApiResponse) => {
           type: 'audio',
           audio_url: audioUrl,
         },
+        config: {
+          stitch: true,
+        },
       }),
     };
 

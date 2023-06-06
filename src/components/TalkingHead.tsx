@@ -10,7 +10,7 @@ const TalkingHead: FC<TalkingHeadProps> = ({ videoURL, imageURL }) => {
     return (
         <div style={{display: 'flex', justifyContent: 'center', width: '100%'}}>
             {videoURL ? (
-                <video src={videoURL} controls>
+                <video src={videoURL} controls width={300}>
                     Your browser does not support the video tag.
                 </video>
             ) : (

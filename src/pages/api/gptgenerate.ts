@@ -27,4 +27,3 @@ const generateAction = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 export default generateAction;
-
